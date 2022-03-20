@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/mitchellh/mapstructure"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -15,9 +16,13 @@ var (
 	Collection *mongo.Collection
 )
 
+type MyStruct struct {
+	Title string `mapstructure:"title"`
+}
+
 func Init(url, dbName, collectionName string) {
 	MongoConnect(url, dbName, collectionName)
-	GetArticles(Client, Collection)
+	// GetArticles(Client, Collection)
 }
 
 func MongoConnect(url, dbName, collectionName string) {
@@ -33,20 +38,23 @@ func MongoConnect(url, dbName, collectionName string) {
 	Collection = client.Database(dbName).Collection(collectionName)
 }
 
-func GetArticles(client *mongo.Client, collection *mongo.Collection) {
-	findOptions := options.Find()            // mongodb document search option
-	findOptions.SetSort(bson.D{{"_id", -1}}) // set sort policy of searched result // 최신순으로
-	findOptions.SetLimit(20)                 // set max number of searched documents policy // 최대 20개 조회
-
+func GetDocuments(client *mongo.Client, collection *mongo.Collection, findOptions *options.FindOptions) []MyStruct {
 	cursor, _ := collection.Find(context.TODO(), bson.D{}, findOptions)
 
+	var articles []MyStruct
 	for cursor.Next(context.TODO()) {
 		var elem bson.M
 		cursor.Decode(&elem)
-		fmt.Println(elem)
+		result := &MyStruct{}
+		if err := mapstructure.Decode(elem, &result); err != nil {
+			fmt.Println(err)
+		}
+		articles = append(articles, *result)
 	}
 
 	MongoDisconnect(client)
+
+	return articles
 }
 
 func MongoDisconnect(client *mongo.Client) {
