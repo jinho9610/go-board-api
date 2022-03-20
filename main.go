@@ -1,29 +1,15 @@
 package main
 
 import (
-	"context"
-	redis "github.com/go-redis/redis/v8"
+	"fmt"
 	"go-board/router"
 	"net/http"
 )
 
-var ctx = context.Background()
-
-func redisTest() {
-	rdb := redis.NewClient(&redis.Options{
-		Addr:     "49.50.162.177:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
-	})
-
-	err := rdb.Set(ctx, "kkey", "vvalue", 0).Err()
-	if err != nil {
-		panic(err)
-	}
-}
-
 func main() {
+	mongoClient, articleCollection = getMongoCollection("mongodb://admin:jinho9611%40@118.67.143.181:27017/admin")
+	getArticles(mongoClient, articleCollection)
 	router.Init()
-	redisTest()
+	fmt.Println("http://localhost:8080")
 	http.ListenAndServe(":8080", router.R)
 }
