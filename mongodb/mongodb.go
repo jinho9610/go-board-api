@@ -34,7 +34,11 @@ func MongoConnect(url, dbName, collectionName string) {
 }
 
 func GetArticles(client *mongo.Client, collection *mongo.Collection) {
-	cursor, _ := collection.Find(context.TODO(), bson.D{{}})
+	findOptions := options.Find()            // mongodb document search option
+	findOptions.SetSort(bson.D{{"_id", -1}}) // set sort policy of searched result // 최신순으로
+	findOptions.SetLimit(20)                 // set max number of searched documents policy // 최대 20개 조회
+
+	cursor, _ := collection.Find(context.TODO(), bson.D{}, findOptions)
 
 	for cursor.Next(context.TODO()) {
 		var elem bson.M
