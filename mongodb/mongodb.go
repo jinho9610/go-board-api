@@ -16,13 +16,15 @@ var (
 	Collection *mongo.Collection
 )
 
-type MyStruct struct {
-	Title string `mapstructure:"title"`
+type Article struct {
+	Title  string `json:"title" mapstructure:"title"`
+	Body   string `json:"body" mapstructure:"body"`
+	Writer string `json:"writer" mapstructure:"writer"`
+	Passwd string `json:"passwd" mapstructure:"passwd"`
 }
 
 func Init(url, dbName, collectionName string) {
 	MongoConnect(url, dbName, collectionName)
-	// GetArticles(Client, Collection)
 }
 
 func MongoConnect(url, dbName, collectionName string) {
@@ -38,14 +40,14 @@ func MongoConnect(url, dbName, collectionName string) {
 	Collection = client.Database(dbName).Collection(collectionName)
 }
 
-func GetDocuments(client *mongo.Client, collection *mongo.Collection, findOptions *options.FindOptions) []MyStruct {
+func GetDocuments(client *mongo.Client, collection *mongo.Collection, findOptions *options.FindOptions) []Article {
 	cursor, _ := collection.Find(context.TODO(), bson.D{}, findOptions)
 
-	var articles []MyStruct
+	var articles []Article
 	for cursor.Next(context.TODO()) {
 		var elem bson.M
 		cursor.Decode(&elem)
-		result := &MyStruct{}
+		result := &Article{}
 		if err := mapstructure.Decode(elem, &result); err != nil {
 			fmt.Println(err)
 		}

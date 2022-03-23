@@ -12,4 +12,7 @@ func Init() {
 	R = mux.NewRouter()
 	R.Methods("GET").Path("/").HandlerFunc(handler.TestHandler) // hello를 출력하는 테스트용 handler
 	R.Methods("GET").Path("/articles").HandlerFunc(handler.GetArticles)
+	R.Methods("GET").Path("/articles/{no}").HandlerFunc(handler.GetArticle)
+
+	R.Methods("POST").Path("/articles").HandlerFunc(handler.PostArticle)
 }
