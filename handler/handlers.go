@@ -48,3 +48,11 @@ func PostArticle(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(article.Writer)
 	fmt.Println(article.Passwd)
 }
+
+func UpdateArticle(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func DeleteArticle(w http.ResponseWriter, r *http.Request) {
+
+}
